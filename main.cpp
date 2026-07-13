@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <X11/keysym.h>
 
-const int CELL_SIZE = 3;
+const int CELL_SIZE = 4;
 
 int GRID_W = 0;
 int GRID_H = 0;
@@ -201,18 +201,6 @@ int main()
     glViewport(0, 0, W, H);
 
     resizeGrid(W,H);
-    // float cell =
-    //     std::min(
-    //         (float)W / GRID_W,
-    //         (float)H / GRID_H);
-
-    float cell = CELL_SIZE;
-
-    float offsetX =
-        (W - GRID_W * cell) * 0.5f;
-
-    float offsetY =
-        (H - GRID_H * cell) * 0.5f;
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -257,11 +245,6 @@ int main()
         {
             W = e.xconfigure.width;
             H = e.xconfigure.height;
-
-            glViewport(0, 0, W, H);
-
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
 
             glOrtho(
                 0.0,
