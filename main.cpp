@@ -77,8 +77,12 @@ void randomizeGrid()
 {
     srand(time(nullptr));
 
-    for (auto &c : grid)
-        c = rand() % 5 == 0;
+    for (int i = 0; i < GRID_W * GRID_H; i++)
+    {
+        grid[i] = rand() % 5 == 0;
+
+        alpha[i] = grid[i] ? 1.0f : 0.0f;
+    }
 
 }
 
@@ -246,90 +250,92 @@ int main()
 
     glDisable(GL_DEPTH_TEST);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
     while (true)
     {
-    while (XPending(dpy))
-    {
-        XEvent e;
-        XNextEvent(dpy, &e);
-
-        if (e.type == KeyPress)
+        while (XPending(dpy))
         {
-            KeySym key =
-                XLookupKeysym(&e.xkey,0);
+            XEvent e;
+            XNextEvent(dpy, &e);
 
-            if(key == XK_r)
+            if (e.type == KeyPress)
             {
-                for(auto &c : grid)
-                    c = rand()%5==0;
-            }
-        }
-        
-        if (e.type == ButtonPress)
-        {
-            if (e.xbutton.button == Button3)
-            {
-                dragging = true;
+                KeySym key =
+                    XLookupKeysym(&e.xkey,0);
 
-                dragStartX = mouseToGridX(e.xbutton.x);
-                dragStartY = mouseToGridY(e.xbutton.y);
-
-                dragEndX = dragStartX;
-                dragEndY = dragStartY;
-            }
-        }
-
-        if (e.type == MotionNotify && dragging)
-        {
-            dragEndX = mouseToGridX(e.xmotion.x);
-            dragEndY = mouseToGridY(e.xmotion.y);
-        }
-
-        if (e.type == ButtonRelease)
-        {
-            if (e.xbutton.button == Button3)
-            {
-                dragging = false;
-
-                int x0 = std::min(dragStartX, dragEndX);
-                int x1 = std::max(dragStartX, dragEndX);
-
-                int y0 = std::min(dragStartY, dragEndY);
-                int y1 = std::max(dragStartY, dragEndY);
-
-                for (int y = y0; y <= y1; y++)
+                if(key == XK_r)
                 {
-                    for (int x = x0; x <= x1; x++)
-                    {
-                        if (x < 0 || y < 0 ||
-                            x >= GRID_W || y >= GRID_H)
-                            continue;
+                    for(auto &c : grid)
+                        c = rand()%5==0;
+                }
+            }
+            
+            if (e.type == ButtonPress)
+            {
+                if (e.xbutton.button == Button3)
+                {
+                    dragging = true;
 
-                        grid[y * GRID_W + x] =
-                            rand() % 2;
+                    dragStartX = mouseToGridX(e.xbutton.x);
+                    dragStartY = mouseToGridY(e.xbutton.y);
+
+                    dragEndX = dragStartX;
+                    dragEndY = dragStartY;
+                }
+            }
+
+            if (e.type == MotionNotify && dragging)
+            {
+                dragEndX = mouseToGridX(e.xmotion.x);
+                dragEndY = mouseToGridY(e.xmotion.y);
+            }
+
+            if (e.type == ButtonRelease)
+            {
+                if (e.xbutton.button == Button3)
+                {
+                    dragging = false;
+
+                    int x0 = std::min(dragStartX, dragEndX);
+                    int x1 = std::max(dragStartX, dragEndX);
+
+                    int y0 = std::min(dragStartY, dragEndY);
+                    int y1 = std::max(dragStartY, dragEndY);
+
+                    for (int y = y0; y <= y1; y++)
+                    {
+                        for (int x = x0; x <= x1; x++)
+                        {
+                            if (x < 0 || y < 0 ||
+                                x >= GRID_W || y >= GRID_H)
+                                continue;
+
+                            grid[y * GRID_W + x] =
+                                rand() % 2;
+                        }
                     }
                 }
             }
+
+            if (e.type == ConfigureNotify)
+            {
+                W = e.xconfigure.width;
+                H = e.xconfigure.height;
+
+                glOrtho(
+                    0.0,
+                    GRID_W,
+                    GRID_H,
+                    0.0,
+                    -1.0,
+                    1.0);
+
+                glMatrixMode(GL_MODELVIEW);
+            }
         }
-
-        if (e.type == ConfigureNotify)
-        {
-            W = e.xconfigure.width;
-            H = e.xconfigure.height;
-
-            glOrtho(
-                0.0,
-                GRID_W,
-                GRID_H,
-                0.0,
-                -1.0,
-                1.0);
-
-            glMatrixMode(GL_MODELVIEW);
-        }
-    }
 
     //-------------------------------------------------
     // Update simulation
@@ -337,6 +343,23 @@ int main()
 
     updateLife();
 
+    for(int i=0;i<GRID_W*GRID_H;i++)
+    {
+        if(grid[i])
+        {
+            alpha[i] += 0.15f;
+
+            if(alpha[i] > 1.0f)
+                alpha[i] = 1.0f;
+        }
+        else
+        {
+            alpha[i] -= 0.05f;
+
+            if(alpha[i] < 0.0f)
+                alpha[i] = 0.0f;
+        }
+    }
 
     int alive = 0;
 
@@ -395,11 +418,21 @@ int main()
         {
             if(!grid[y*GRID_W+x])
                 continue;
+            int index = y * GRID_W + x;
 
-            glColor3f(
+            if(alpha[index] <= 0.01f)
+                continue;
+
+            glColor4f(
                 0.2f,
                 0.55f,
-                1.0f);
+                1.0f,
+                alpha[index]);
+                
+            // glColor3f(
+            //     0.2f,
+            //     0.55f,
+            //     1.0f);
 
             float px = offsetX + x * cell;
             float py = offsetY + y * cell;
