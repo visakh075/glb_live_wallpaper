@@ -19,6 +19,15 @@ int GRID_H = 0;
 
 std::vector<uint8_t> grid;
 std::vector<uint8_t> nextGrid;
+std::vector<float> alpha;
+
+bool dragging = false;
+
+int dragStartX = 0;
+int dragStartY = 0;
+
+int dragEndX = 0;
+int dragEndY = 0;
 
 void updateLife();
 void updateLife()
@@ -70,6 +79,7 @@ void randomizeGrid()
 
     for (auto &c : grid)
         c = rand() % 5 == 0;
+
 }
 
 void resizeGrid(int W, int H)
@@ -79,7 +89,10 @@ void resizeGrid(int W, int H)
 
     grid.resize(GRID_W * GRID_H);
     nextGrid.resize(GRID_W * GRID_H);
+    alpha.resize(GRID_W * GRID_H);
 
+    for (auto &a : alpha)
+        a = 0.0f;
     randomizeGrid();
 }
 
@@ -100,6 +113,16 @@ static void setAtom(Display *dpy,
         PropModeReplace,
         (unsigned char *)&atom,
         1);
+}
+
+inline int mouseToGridX(int x)
+{
+    return x / CELL_SIZE;
+}
+
+inline int mouseToGridY(int y)
+{
+    return y / CELL_SIZE;
 }
 
 int main()
@@ -139,9 +162,12 @@ int main()
     swa.colormap = cmap;
     swa.override_redirect = True;
     swa.event_mask =
-    ExposureMask |
-    StructureNotifyMask |
-    KeyPressMask;
+        ExposureMask |
+        StructureNotifyMask |
+        KeyPressMask |
+        ButtonPressMask |
+        ButtonReleaseMask |
+        PointerMotionMask;
 
     Window win =
         XCreateWindow(
@@ -240,6 +266,53 @@ int main()
                     c = rand()%5==0;
             }
         }
+        
+        if (e.type == ButtonPress)
+        {
+            if (e.xbutton.button == Button3)
+            {
+                dragging = true;
+
+                dragStartX = mouseToGridX(e.xbutton.x);
+                dragStartY = mouseToGridY(e.xbutton.y);
+
+                dragEndX = dragStartX;
+                dragEndY = dragStartY;
+            }
+        }
+
+        if (e.type == MotionNotify && dragging)
+        {
+            dragEndX = mouseToGridX(e.xmotion.x);
+            dragEndY = mouseToGridY(e.xmotion.y);
+        }
+
+        if (e.type == ButtonRelease)
+        {
+            if (e.xbutton.button == Button3)
+            {
+                dragging = false;
+
+                int x0 = std::min(dragStartX, dragEndX);
+                int x1 = std::max(dragStartX, dragEndX);
+
+                int y0 = std::min(dragStartY, dragEndY);
+                int y1 = std::max(dragStartY, dragEndY);
+
+                for (int y = y0; y <= y1; y++)
+                {
+                    for (int x = x0; x <= x1; x++)
+                    {
+                        if (x < 0 || y < 0 ||
+                            x >= GRID_W || y >= GRID_H)
+                            continue;
+
+                        grid[y * GRID_W + x] =
+                            rand() % 2;
+                    }
+                }
+            }
+        }
 
         if (e.type == ConfigureNotify)
         {
@@ -293,7 +366,28 @@ int main()
     float offsetY =
         (H - GRID_H * cell) * 0.5f;
 
+    if (dragging)
+        {
+            glColor3f(1.0f,1.0f,1.0f);
+
+            glBegin(GL_LINE_LOOP);
+
+            float x0 = dragStartX * CELL_SIZE;
+            float y0 = dragStartY * CELL_SIZE;
+
+            float x1 = dragEndX * CELL_SIZE;
+            float y1 = dragEndY * CELL_SIZE;
+
+            glVertex2f(x0,y0);
+            glVertex2f(x1,y0);
+            glVertex2f(x1,y1);
+            glVertex2f(x0,y1);
+
+            glEnd();
+        }
+
     glBegin(GL_QUADS);
+
 
     for(int y=0;y<GRID_H;y++)
     {
