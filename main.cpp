@@ -73,6 +73,46 @@ void updateLife()
     grid.swap(nextGrid);
 }
 
+struct Cell
+{
+    bool alive = false;
+    bool nextAlive = false;
+
+    float alpha = 0.0f;
+    float scale = 0.0f;
+
+    uint8_t age = 0;
+};
+
+class GameOfLife
+{
+public:
+
+    void resize(int w,int h);
+
+    void randomize();
+
+    void update();
+
+    void draw();
+
+    void clear();
+
+    void fillRectangle(
+        int x0,
+        int y0,
+        int x1,
+        int y1);
+
+private:
+
+    int width;
+    int height;
+
+    std::vector<Cell> cells;
+};
+
+
 void randomizeGrid()
 {
     srand(time(nullptr));
