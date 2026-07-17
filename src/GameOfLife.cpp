@@ -261,33 +261,7 @@ void GameOfLife::render(Renderer& renderer)
         (m_dragEndX-m_dragStartX+1)*m_cellSize,
         (m_dragEndY-m_dragStartY+1)*m_cellSize,
         1,1,1,1);
-        // renderer.drawLine(
-        //     m_dragStartX,
-        //     m_dragStartY,
-        //     m_dragEndX,
-        //     m_dragStartY,
-        //     1,1,1,1);
 
-        // renderer.drawLine(
-        //     m_dragEndX,
-        //     m_dragStartY,
-        //     m_dragEndX,
-        //     m_dragEndY,
-        //     1,1,1,1);
-
-        // renderer.drawLine(
-        //     m_dragEndX,
-        //     m_dragEndY,
-        //     m_dragStartX,
-        //     m_dragEndY,
-        //     1,1,1,1);
-
-        // renderer.drawLine(
-        //     m_dragStartX,
-        //     m_dragEndY,
-        //     m_dragStartX,
-        //     m_dragStartY,
-        //     1,1,1,1);
     }
 }
 
