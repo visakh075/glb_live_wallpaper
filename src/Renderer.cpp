@@ -147,3 +147,26 @@ void Renderer::drawRectangleOutline(
 
     glEnd();
 }
+
+void Renderer::drawTriangle(
+    float x1,
+    float y1,
+    float x2,
+    float y2,
+    float x3,
+    float y3,
+    float r,
+    float g,
+    float b,
+    float a)
+{
+    glColor4f(r, g, b, a);
+
+    glBegin(GL_TRIANGLES);
+
+    glVertex2f(x1, y1);
+    glVertex2f(x2, y2);
+    glVertex2f(x3, y3);
+
+    glEnd();
+}

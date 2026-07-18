@@ -15,6 +15,7 @@ add_executable(livewall
     src/Renderer.cpp
     src/Input.cpp
     src/GameOfLife.cpp
+    src/boids.cpp
 )
 
 target_include_directories(livewall

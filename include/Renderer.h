@@ -60,6 +60,18 @@ public:
     float b,
     float a);
 
+    void drawTriangle(
+    float x1,
+    float y1,
+    float x2,
+    float y2,
+    float x3,
+    float y3,
+    float r,
+    float g,
+    float b,
+    float a = 1.0f);
+
 private:
 
     int m_width = 0;

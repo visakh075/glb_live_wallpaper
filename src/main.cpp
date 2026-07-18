@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "Renderer.h"
-#include "GameOfLife.h"
+// #include "GameOfLife.h"
+#include "Boids.h"
 #include "Input.h"
 
 #include <chrono>
@@ -21,7 +22,8 @@ int main()
         window.width(),
         window.height());
 
-    GameOfLife effect;
+    // GameOfLife effect;
+    Boids effect;
 
     effect.initialize(renderer);
 
