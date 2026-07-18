@@ -6,6 +6,11 @@
 #include "Cell.h"
 
 class Renderer;
+enum class BrushMode
+{
+    Random,
+    Clear
+};
 
 class GameOfLife : public Effect
 {
@@ -112,7 +117,8 @@ private:
         int x0,
         int y0,
         int x1,
-        int y1);
+        int y1,
+        BrushMode mode);
 
     int pixelToGridX(
         int x) const;

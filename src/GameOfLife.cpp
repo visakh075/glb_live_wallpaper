@@ -2,8 +2,11 @@
 #include "Renderer.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
+BrushMode m_brushMode = BrushMode::Random;
 
 GameOfLife::GameOfLife()
 {
@@ -291,8 +294,30 @@ void GameOfLife::mousePress(
     int x,
     int y)
 {
-    if(button != Button3)
-        return;
+    switch(button)
+    {
+        case Button1:
+
+            m_brushMode = BrushMode::Random;
+
+            break;
+
+        case Button3:
+
+            m_brushMode = BrushMode::Clear;
+
+            break;
+
+        case Button2:
+
+            randomize();
+
+            return;
+
+        default:
+
+            return;
+    }
 
     m_dragging = true;
 
@@ -316,14 +341,12 @@ void GameOfLife::mouseMove(
 
 void GameOfLife::mouseRelease(
     int button,
-    int x,
-    int y)
+    int,
+    int)
 {
-    if(button != Button3)
+    if(button != Button1 &&
+       button != Button3)
         return;
-
-    (void)x;
-    (void)y;
 
     m_dragging = false;
 
@@ -331,14 +354,16 @@ void GameOfLife::mouseRelease(
         m_dragStartX,
         m_dragStartY,
         m_dragEndX,
-        m_dragEndY);
+        m_dragEndY,
+        m_brushMode);
 }
 
 void GameOfLife::paintRectangle(
     int x0,
     int y0,
     int x1,
-    int y1)
+    int y1,
+    BrushMode mode)
 {
     if(x0 > x1)
         std::swap(x0,x1);
@@ -353,17 +378,39 @@ void GameOfLife::paintRectangle(
             if(!inside(x,y))
                 continue;
 
-            Cell& c =
-                cell(x,y);
+            Cell& c = cell(x,y);
 
-            c.alive =
-                rand()%2;
-
-            if(c.alive)
+            switch(mode)
             {
-                c.alpha = 1.0f;
-                c.scale = 1.0f;
-                c.age = 0;
+                case BrushMode::Random:
+                {
+                    c.alive = rand() & 1;
+
+                    if(c.alive)
+                    {
+                        c.alpha = 1.0f;
+                        c.scale = 1.0f;
+                        c.age = 0;
+                    }
+                    else
+                    {
+                        c.alpha = 0.0f;
+                        c.scale = 0.0f;
+                        c.age = 0;
+                    }
+
+                    break;
+                }
+
+                case BrushMode::Clear:
+                {
+                    c.alive = false;
+                    c.alpha = 0.0f;
+                    c.scale = 0.0f;
+                    c.age = 0;
+
+                    break;
+                }
             }
         }
     }

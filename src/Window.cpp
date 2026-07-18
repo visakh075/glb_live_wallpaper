@@ -3,6 +3,8 @@
 #include "Effect.h"
 #include "Input.h"
 
+#include <iostream>
+
 #include <X11/Xatom.h>
 
 namespace
@@ -120,8 +122,8 @@ bool WindowManager::create()
     setAtom(
         m_display,
         m_window,
-        "_NET_WM_WindowManagerYPE",
-        "_NET_WM_WindowManagerYPE_DESKTOP");
+        "_NET_WM_WINDOW_TYPE",
+        "_NET_WM_WINDOW_TYPE_DESKTOP");
 
     Atom state =
         XInternAtom(
