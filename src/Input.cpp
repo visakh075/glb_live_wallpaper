@@ -4,7 +4,7 @@
 
 #include "Effect.h"
 #include "Window.h"
-
+#include "Event.h"
 void Input::processEvent(
     const XEvent& event,
     WindowManager& window,
@@ -14,12 +14,18 @@ void Input::processEvent(
     {
         case ConfigureNotify:
         {
-            effect.resize(
-                event.xconfigure.width,
-                event.xconfigure.height);
+            Event e;
 
+            e.type = Event::Type::WindowResize;
+
+            e.width = event.xconfigure.width;
+
+            e.height = event.xconfigure.height;
+
+            effect.onEvent(e);
             break;
         }
+
 
         case KeyPress:
         {
@@ -28,10 +34,17 @@ void Input::processEvent(
                     const_cast<XKeyEvent*>(&event.xkey),
                     0);
 
-            effect.keyPress(key);
+            Event e;
+
+            e.type = Event::Type::KeyboardPress;
+
+            e.key = static_cast<uint32_t>(key);
+
+            effect.onEvent(e);
 
             break;
         }
+        
 
         case KeyRelease:
         {
@@ -40,36 +53,62 @@ void Input::processEvent(
                     const_cast<XKeyEvent*>(&event.xkey),
                     0);
 
-            effect.keyRelease(key);
+            Event e;
+
+            e.type = Event::Type::KeyboardRelease;
+
+            e.key = static_cast<uint32_t>(key);
+
+            effect.onEvent(e);
 
             break;
         }
 
         case ButtonPress:
         {
-            effect.mousePress(
-                event.xbutton.button,
-                event.xbutton.x,
-                event.xbutton.y);
+            Event e;
+
+            e.type = Event::Type::MouseButtonPress;
+
+            e.button = event.xbutton.button;
+
+            e.x = event.xbutton.x;
+
+            e.y = event.xbutton.y;
+
+            effect.onEvent(e);
 
             break;
         }
 
         case ButtonRelease:
         {
-            effect.mouseRelease(
-                event.xbutton.button,
-                event.xbutton.x,
-                event.xbutton.y);
+            Event e;
+
+            e.type = Event::Type::MouseButtonRelease;
+
+            e.button = event.xbutton.button;
+
+            e.x = event.xbutton.x;
+
+            e.y = event.xbutton.y;
+
+            effect.onEvent(e);
 
             break;
         }
 
         case MotionNotify:
         {
-            effect.mouseMove(
-                event.xmotion.x,
-                event.xmotion.y);
+            Event e;
+
+            e.type = Event::Type::MouseMotion;
+
+            e.x = event.xmotion.x;
+
+            e.y = event.xmotion.y;
+
+            effect.onEvent(e);
 
             break;
         }

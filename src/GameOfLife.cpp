@@ -6,6 +6,10 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+
 BrushMode m_brushMode = BrushMode::Random;
 
 GameOfLife::GameOfLife()
@@ -268,6 +272,142 @@ void GameOfLife::render(Renderer& renderer)
     }
 }
 
+void GameOfLife::paintRectangle(
+    int x0,
+    int y0,
+    int x1,
+    int y1,
+    BrushMode mode)
+{
+    if(x0 > x1)
+        std::swap(x0,x1);
+
+    if(y0 > y1)
+        std::swap(y0,y1);
+
+    for(int y = y0; y <= y1; y++)
+    {
+        for(int x = x0; x <= x1; x++)
+        {
+            if(!inside(x,y))
+                continue;
+
+            Cell& c = cell(x,y);
+
+            switch(mode)
+            {
+                case BrushMode::Random:
+                {
+                    c.alive = rand() & 1;
+
+                    if(c.alive)
+                    {
+                        c.alpha = 1.0f;
+                        c.scale = 1.0f;
+                        c.age = 0;
+                    }
+                    else
+                    {
+                        c.alpha = 0.0f;
+                        c.scale = 0.0f;
+                        c.age = 0;
+                    }
+
+                    break;
+                }
+
+                case BrushMode::Clear:
+                {
+                    c.alive = false;
+                    c.alpha = 0.0f;
+                    c.scale = 0.0f;
+                    c.age = 0;
+
+                    break;
+                }
+            }
+        }
+    }
+}
+
+int GameOfLife::pixelToGridX(
+    int x) const
+{
+    return x / m_cellSize;
+}
+
+int GameOfLife::pixelToGridY(
+    int y) const
+{
+    return y / m_cellSize;
+}
+
+void GameOfLife::onEvent(
+    const Event& e)
+{
+    switch(e.type)
+    {
+        case Event::Type::MouseButtonPress:
+        {
+            mousePress(
+                e.button,
+                e.x,
+                e.y);
+
+            break;
+        }
+
+        case Event::Type::MouseMotion:
+        {
+            mouseMove(
+                e.x,
+                e.y);
+
+            break;
+        }
+
+        case Event::Type::MouseButtonRelease:
+        {
+            mouseRelease(
+                e.button,
+                e.x,
+                e.y);
+
+            break;
+        }
+
+        case Event::Type::KeyboardPress:
+        {
+            keyPress(
+                static_cast<KeySym>(e.key));
+
+            break;
+        }
+
+        // case Event::Type::KeyboardRelease:
+        // {
+        //     keyRelease(
+        //         static_cast<KeySym>(e.key));
+
+        //     break;
+        // }
+
+        case Event::Type::WindowResize:
+        {
+            resize(
+                e.width,
+                e.height);
+
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+}
+
 void GameOfLife::keyPress(KeySym key)
 {
     switch(key)
@@ -357,74 +497,3 @@ void GameOfLife::mouseRelease(
         m_dragEndY,
         m_brushMode);
 }
-
-void GameOfLife::paintRectangle(
-    int x0,
-    int y0,
-    int x1,
-    int y1,
-    BrushMode mode)
-{
-    if(x0 > x1)
-        std::swap(x0,x1);
-
-    if(y0 > y1)
-        std::swap(y0,y1);
-
-    for(int y = y0; y <= y1; y++)
-    {
-        for(int x = x0; x <= x1; x++)
-        {
-            if(!inside(x,y))
-                continue;
-
-            Cell& c = cell(x,y);
-
-            switch(mode)
-            {
-                case BrushMode::Random:
-                {
-                    c.alive = rand() & 1;
-
-                    if(c.alive)
-                    {
-                        c.alpha = 1.0f;
-                        c.scale = 1.0f;
-                        c.age = 0;
-                    }
-                    else
-                    {
-                        c.alpha = 0.0f;
-                        c.scale = 0.0f;
-                        c.age = 0;
-                    }
-
-                    break;
-                }
-
-                case BrushMode::Clear:
-                {
-                    c.alive = false;
-                    c.alpha = 0.0f;
-                    c.scale = 0.0f;
-                    c.age = 0;
-
-                    break;
-                }
-            }
-        }
-    }
-}
-
-int GameOfLife::pixelToGridX(
-    int x) const
-{
-    return x / m_cellSize;
-}
-
-int GameOfLife::pixelToGridY(
-    int y) const
-{
-    return y / m_cellSize;
-}
-

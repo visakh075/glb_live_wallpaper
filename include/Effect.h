@@ -1,62 +1,33 @@
 #pragma once
 
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-
 class Renderer;
+struct Event;
 
 class Effect
 {
 public:
 
-    virtual ~Effect() = default;
+    virtual ~Effect(){}
 
-    virtual bool initialize(Renderer& renderer)
+    virtual bool initialize(Renderer&)
     {
         return true;
     }
 
-    virtual void shutdown()
-    {
-    }
+    virtual void shutdown(){}
 
     virtual void resize(
-        int width,
-        int height) = 0;
-
-    virtual void update(
-        float dt) = 0;
-
-    virtual void render(
-        Renderer& renderer) = 0;
-
-    virtual void keyPress(
-        KeySym key)
+        int,
+        int)
     {
     }
 
-    virtual void keyRelease(
-        KeySym key)
+    virtual void update(float)=0;
+
+    virtual void render(Renderer&)=0;
+
+    virtual void onEvent(
+        const Event&)
     {
     }
-
-    virtual void mousePress(
-        int button,
-        int x,
-        int y)
-    {
-    }
-
-    virtual void mouseRelease(
-        int button,
-        int x,
-        int y)
-    {
-    }
-
-    virtual void mouseMove(
-        int x,
-        int y)
-    {
-    };
 };

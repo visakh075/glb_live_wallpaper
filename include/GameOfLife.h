@@ -4,6 +4,10 @@
 
 #include "Effect.h"
 #include "Cell.h"
+#include "Event.h"
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 class Renderer;
 enum class BrushMode
@@ -33,22 +37,8 @@ public:
     void render(
         Renderer& renderer) override;
 
-    void keyPress(
-        KeySym key) override;
-
-    void mousePress(
-        int button,
-        int x,
-        int y) override;
-
-    void mouseRelease(
-        int button,
-        int x,
-        int y) override;
-
-    void mouseMove(
-        int x,
-        int y) override;
+void onEvent(
+    const Event& e) override;
 
 private:
 
@@ -59,7 +49,7 @@ private:
     int m_width = 0;
     int m_height = 0;
 
-    int m_cellSize = 4;
+    int m_cellSize = 5;
 
     std::vector<Cell> m_cells;
     std::vector<Cell> m_nextCells;
@@ -125,4 +115,21 @@ private:
 
     int pixelToGridY(
         int y) const;
+
+    void keyPress(
+        KeySym key);
+
+    void mousePress(
+        int button,
+        int x,
+        int y);
+
+    void mouseRelease(
+        int button,
+        int x,
+        int y);
+
+    void mouseMove(
+        int x,
+        int y);
 };
