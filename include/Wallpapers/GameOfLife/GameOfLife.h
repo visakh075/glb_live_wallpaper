@@ -2,9 +2,10 @@
 
 #include <vector>
 
-#include "Effect.h"
-#include "Cell.h"
-#include "Event.h"
+#include "Core/Wallpaper.h"
+#include "Core/Event.h"
+
+#include "Wallpapers/GameOfLife/Cell.h"
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -16,7 +17,7 @@ enum class BrushMode
     Clear
 };
 
-class GameOfLife : public Effect
+class GameOfLife : public Wallpaper
 {
 public:
 

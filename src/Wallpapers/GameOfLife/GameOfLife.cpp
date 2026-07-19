@@ -1,5 +1,5 @@
-#include "GameOfLife.h"
-#include "Renderer.h"
+#include "Wallpapers/GameOfLife/GameOfLife.h"
+#include "Core/Renderer.h"
 
 #include <algorithm>
 #include <cstdio>

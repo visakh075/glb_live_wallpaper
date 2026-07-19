@@ -3,7 +3,7 @@
 #include <X11/Xlib.h>
 #include <GL/glx.h>
 
-class Effect;
+class Wallpaper;
 
 class WindowManager
 {
@@ -20,7 +20,7 @@ public:
 
     void close();
 
-    void pollEvents(Effect& effect);
+    void pollEvents(Wallpaper& effect);
 
     void swapBuffers();
 

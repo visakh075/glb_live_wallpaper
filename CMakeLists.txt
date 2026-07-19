@@ -1,38 +1,96 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(LiveWall LANGUAGES CXX)
+project(
+    LiveWall
+    LANGUAGES CXX
+)
+
+# --------------------------------------------------
+# C++
+# --------------------------------------------------
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# --------------------------------------------------
+# Dependencies
+# --------------------------------------------------
+
 find_package(OpenGL REQUIRED)
 find_package(X11 REQUIRED)
 
-add_executable(livewall
+# --------------------------------------------------
+# Source Files
+# --------------------------------------------------
+
+set(CORE_SOURCES
+
+    src/Core/Wallpaper.cpp
+    src/Core/Input.cpp
+    src/Core/Renderer.cpp
+    src/Core/Window.cpp
+)
+
+set(WALLPAPER_SOURCES
+
+    src/Wallpapers/GameOfLife/GameOfLife.cpp
+)
+
+set(SOURCES
+
     src/main.cpp
-    src/Window.cpp
-    src/Renderer.cpp
-    src/Input.cpp
-    src/GameOfLife.cpp
-    
+
+    ${CORE_SOURCES}
+
+    ${WALLPAPER_SOURCES}
 )
 
-target_include_directories(livewall
-    PRIVATE
-        include
+# --------------------------------------------------
+# Executable
+# --------------------------------------------------
+
+add_executable(
+    livewall
+    ${SOURCES}
 )
 
-target_link_libraries(livewall
+# --------------------------------------------------
+# Include Directories
+# --------------------------------------------------
+
+target_include_directories(
+    livewall
+
     PRIVATE
-        OpenGL::GL
-        ${X11_LIBRARIES}
-        pthread
+
+    include
 )
 
-target_compile_options(livewall
+# --------------------------------------------------
+# Libraries
+# --------------------------------------------------
+
+target_link_libraries(
+    livewall
+
     PRIVATE
-        -Wall
-        -Wextra
-        -Wpedantic
+
+    OpenGL::GL
+    ${X11_LIBRARIES}
+    pthread
+)
+
+# --------------------------------------------------
+# Compiler Options
+# --------------------------------------------------
+
+target_compile_options(
+    livewall
+
+    PRIVATE
+
+    -Wall
+    -Wextra
+    -Wpedantic
 )

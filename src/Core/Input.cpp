@@ -1,14 +1,14 @@
-#include "Input.h"
+#include "Core/Input.h"
 
 #include <X11/keysym.h>
 
-#include "Effect.h"
-#include "Window.h"
-#include "Event.h"
+#include "Core/Wallpaper.h"
+#include "Core/Window.h"
+#include "Core/Event.h"
 void Input::processEvent(
     const XEvent& event,
     WindowManager& window,
-    Effect& effect)
+    Wallpaper& effect)
 {
     switch(event.type)
     {

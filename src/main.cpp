@@ -1,7 +1,7 @@
-#include "Window.h"
-#include "Renderer.h"
-#include "GameOfLife.h"
-#include "Input.h"
+#include "Core/Window.h"
+#include "Core/Renderer.h"
+#include "Wallpapers/GameOfLife/GameOfLife.h"
+#include "Core/Input.h"
 
 #include <chrono>
 

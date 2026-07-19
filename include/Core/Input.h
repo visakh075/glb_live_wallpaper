@@ -3,7 +3,7 @@
 #include <X11/Xlib.h>
 
 class WindowManager;
-class Effect;
+class Wallpaper;
 
 class Input
 {
@@ -12,5 +12,5 @@ public:
     static void processEvent(
         const XEvent& event,
         WindowManager& window,
-        Effect& effect);
+        Wallpaper& effect);
 };

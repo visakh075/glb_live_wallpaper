@@ -1,7 +1,7 @@
-#include "Window.h"
+#include "Core/Window.h"
 
-#include "Effect.h"
-#include "Input.h"
+#include "Core/Wallpaper.h"
+#include "Core/Input.h"
 
 #include <iostream>
 
@@ -220,7 +220,7 @@ void WindowManager::close()
 }
 
 void WindowManager::pollEvents(
-    Effect& effect)
+    Wallpaper& effect)
 {
     while(XPending(m_display))
     {
