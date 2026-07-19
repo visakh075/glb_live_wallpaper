@@ -30,6 +30,7 @@ set(CORE_SOURCES
     src/Core/Input.cpp
     src/Core/Renderer.cpp
     src/Core/Window.cpp
+    src/Engine/Engine.cpp
 )
 
 set(WALLPAPER_SOURCES
