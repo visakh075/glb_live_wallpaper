@@ -499,5 +499,5 @@ void GameOfLife::mouseRelease(
         m_brushMode);
 }
 
-LIVEWALL_REGISTER_DEFAULT_WALLPAPER(GameOfLife)
+// LIVEWALL_REGISTER_DEFAULT_WALLPAPER(GameOfLife)
 
