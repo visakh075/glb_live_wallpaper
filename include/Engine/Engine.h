@@ -1,10 +1,9 @@
 #pragma once
 
-#include <memory>
-
 #include "Core/Window.h"
 #include "Core/Renderer.h"
-#include "Core/Wallpaper.h"
+
+#include "Engine/WallpaperManager.h"
 
 class Engine
 {
@@ -25,5 +24,5 @@ private:
 
     Renderer m_renderer;
 
-    std::unique_ptr<Wallpaper> m_wallpaper;
+    WallpaperManager m_wallpapers;
 };

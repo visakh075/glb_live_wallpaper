@@ -31,11 +31,14 @@ set(CORE_SOURCES
     src/Core/Renderer.cpp
     src/Core/Window.cpp
     src/Engine/Engine.cpp
+    src/Engine/WallpaperManager.cpp
+    src/Engine/WallpaperRegistry.cpp
 )
 
 set(WALLPAPER_SOURCES
 
     src/Wallpapers/GameOfLife/GameOfLife.cpp
+    src/Wallpapers/Boids/Boids.cpp
 )
 
 set(SOURCES

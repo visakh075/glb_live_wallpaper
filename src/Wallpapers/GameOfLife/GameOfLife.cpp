@@ -1,4 +1,5 @@
 #include "Wallpapers/GameOfLife/GameOfLife.h"
+#include "Core/RegisterWallpaper.h"
 #include "Core/Renderer.h"
 
 #include <algorithm>
@@ -497,3 +498,6 @@ void GameOfLife::mouseRelease(
         m_dragEndY,
         m_brushMode);
 }
+
+LIVEWALL_REGISTER_DEFAULT_WALLPAPER(GameOfLife)
+
