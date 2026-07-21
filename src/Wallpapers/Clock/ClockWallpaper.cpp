@@ -3,11 +3,33 @@
 #include <ctime>
 #include <cmath>
 
-bool ClockWallpaper::initialize(Renderer&)
+bool ClockWallpaper::initialize(Renderer&renderer)
 {
+
+
     rad_out = 500;
     rad_in = 450;
     rad_sec = 440;
+
+    center =
+    {
+        (renderer.width() / 2.0f) - 700,
+        renderer.height() / 2.0f
+    };    
+    // /usr/share/fonts/truetype/noto/NotoSerif-Regular.ttf
+    if(!renderer.loadFont(
+            "/usr/local/share/fonts/Hermit-Bold.otf",
+            48))
+    {
+        printf("Font load failed\n");
+    }
+    else
+    {
+        printf("Font loaded\n");
+    }
+
+    return true;
+
     return true;
 }
 
@@ -19,6 +41,7 @@ void ClockWallpaper::update(float)
     m_second = float(tm->tm_sec);
     m_minute = float(tm->tm_min) + m_second / 60.f;
     m_hour = float(tm->tm_hour % 12) + m_minute / 60.f;
+    m_hour24 = float(tm->tm_hour);
 }
 
 
@@ -158,6 +181,26 @@ void ClockWallpaper::render(Renderer& renderer)
     cirDial(center,400,10,sAng,red,renderer);
     circle(center,10,blue,renderer);
 
+    char timeStr[32];
+
+    std::snprintf(
+        timeStr,
+        sizeof(timeStr),
+        "%02d:%02d:%02d",
+        (int)m_hour24,
+        (int)m_minute,
+        (int)m_second);
+        
+    
+    renderer.drawText(
+        center.x - 100,
+        center.y + 80,
+        timeStr,
+        1,
+        1,
+        1,
+        1);
+        
 }
 
 #include "Core/RegisterWallpaper.h"

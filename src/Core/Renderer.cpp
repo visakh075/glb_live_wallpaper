@@ -2,14 +2,11 @@
 
 #include <GL/gl.h>
 #include <cmath>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
-Renderer::Renderer()
-{
-}
-
-Renderer::~Renderer()
-{
-}
+Renderer::Renderer(){}
+Renderer::~Renderer(){ unloadFont(); }
 
 bool Renderer::initialize()
 {
@@ -23,9 +20,7 @@ bool Renderer::initialize()
     return true;
 }
 
-void Renderer::shutdown()
-{
-}
+void Renderer::shutdown(){}
 
 void Renderer::resize(
     int width,
@@ -344,4 +339,330 @@ void Renderer::scale(
         x,
         y,
         1.0f);
+}
+
+
+bool Renderer::loadFont(
+    const std::string& path,
+    int pixelSize)
+{
+    unloadFont();
+
+    FT_Library ft;
+    if(FT_Init_FreeType(&ft))
+        return false;
+
+    FT_Face face;
+    if(FT_New_Face(ft,path.c_str(),0,&face))
+    {
+        FT_Done_FreeType(ft);
+        return false;
+    }
+
+    FT_Set_Pixel_Sizes(face,0,pixelSize);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+
+    for(unsigned char c=0;c<128;c++)
+    {
+        if(FT_Load_Char(face,c,FT_LOAD_RENDER))
+            continue;
+
+        GLuint tex;
+        glGenTextures(1,&tex);
+        glBindTexture(GL_TEXTURE_2D,tex);
+
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_ALPHA,
+            face->glyph->bitmap.width,
+            face->glyph->bitmap.rows,
+            0,
+            GL_ALPHA,
+            GL_UNSIGNED_BYTE,
+            face->glyph->bitmap.buffer);
+
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+
+        Glyph g;
+        g.texture=tex;
+        g.width=face->glyph->bitmap.width;
+        g.height=face->glyph->bitmap.rows;
+        g.bearingX=face->glyph->bitmap_left;
+        g.bearingY=face->glyph->bitmap_top;
+        g.advance=face->glyph->advance.x;
+
+        m_fontGlyphs[c]=g;
+    }
+
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
+
+    m_fontLoaded=true;
+    return true;
+}
+
+void Renderer::unloadFont()
+{
+    for(auto& [c,g] : m_fontGlyphs)
+        if(g.texture)
+            glDeleteTextures(1,&g.texture);
+
+    m_fontGlyphs.clear();
+    m_fontLoaded=false;
+}
+
+void Renderer::drawText(
+    float x,float y,
+    const std::string& text,
+    float r,float g,float b,
+    float a)
+{
+    if(!m_fontLoaded)
+        return;
+
+    glEnable(GL_TEXTURE_2D);
+    glColor4f(r,g,b,a);
+
+    for(char c : text)
+    {
+        auto it=m_fontGlyphs.find(c);
+        if(it==m_fontGlyphs.end())
+            continue;
+
+        auto& g=it->second;
+
+        float xpos=x+g.bearingX;
+        float ypos=y-g.bearingY;
+
+        float w=g.width;
+        float h=g.height;
+
+        glBindTexture(GL_TEXTURE_2D,g.texture);
+
+        glBegin(GL_QUADS);
+
+        glTexCoord2f(0,0); glVertex2f(xpos,ypos);
+        glTexCoord2f(1,0); glVertex2f(xpos+w,ypos);
+        glTexCoord2f(1,1); glVertex2f(xpos+w,ypos+h);
+        glTexCoord2f(0,1); glVertex2f(xpos,ypos+h);
+
+        glEnd();
+
+        x += (g.advance >> 6);
+    }
+
+    glDisable(GL_TEXTURE_2D);
+}
+
+void Renderer::cdrawText(
+    float x,
+    float y,
+    const std::string& text,
+    float r,
+    float g,
+    float b,
+    float a)
+{
+    if(!m_fontLoaded)
+        return;
+
+    float width = 0.f;
+
+    float ascent = 0.f;
+    float descent = 0.f;
+
+    //
+    // Measure text bounds
+    //
+    for(char c : text)
+    {
+        auto it =
+            m_fontGlyphs.find(c);
+
+        if(it ==
+           m_fontGlyphs.end())
+        {
+            continue;
+        }
+
+        auto& glyph =
+            it->second;
+
+        width +=
+            (glyph.advance >> 6);
+
+        if(glyph.bearingY >
+           ascent)
+        {
+            ascent =
+                glyph.bearingY;
+        }
+
+        float d =
+            glyph.height -
+            glyph.bearingY;
+
+        if(d >
+           descent)
+        {
+            descent = d;
+        }
+    }
+
+    float height =
+        ascent +
+        descent;
+
+    //
+    // Convert center
+    // position into
+    // baseline position
+    //
+    x -= width * 0.5f;
+
+    y += ascent;
+    y -= height * 0.5f;
+
+    glEnable(
+        GL_TEXTURE_2D);
+
+    glColor4f(
+        r,
+        g,
+        b,
+        a);
+
+    for(char c : text)
+    {
+        auto it =
+            m_fontGlyphs.find(c);
+
+        if(it ==
+           m_fontGlyphs.end())
+        {
+            continue;
+        }
+
+        auto& glyph =
+            it->second;
+
+        float xpos =
+            x +
+            glyph.bearingX;
+
+        float ypos =
+            y -
+            glyph.bearingY;
+
+        float w =
+            glyph.width;
+
+        float h =
+            glyph.height;
+
+        glBindTexture(
+            GL_TEXTURE_2D,
+            glyph.texture);
+
+        glBegin(
+            GL_QUADS);
+
+        glTexCoord2f(
+            0.f,
+            0.f);
+        glVertex2f(
+            xpos,
+            ypos);
+
+        glTexCoord2f(
+            1.f,
+            0.f);
+        glVertex2f(
+            xpos + w,
+            ypos);
+
+        glTexCoord2f(
+            1.f,
+            1.f);
+        glVertex2f(
+            xpos + w,
+            ypos + h);
+
+        glTexCoord2f(
+            0.f,
+            1.f);
+        glVertex2f(
+            xpos,
+            ypos + h);
+
+        glEnd();
+
+        x +=
+            (glyph.advance >> 6);
+    }
+
+    glDisable(
+        GL_TEXTURE_2D);
+}
+
+void Renderer::drawArcDial(
+    float cx,
+    float cy,
+    float innerRadius,
+    float outerRadius,
+    float startAngle,
+    float endAngle,
+    float r,
+    float g,
+    float b,
+    float a)
+{
+    constexpr int segments = 360;
+
+    glColor4f(r, g, b, a);
+
+    glBegin(GL_TRIANGLE_STRIP);
+
+    for(int i = 0;
+        i <= segments;
+        ++i)
+    {
+        float t =
+            float(i) /
+            float(segments);
+
+        float ang =
+            startAngle +
+            t *
+            (endAngle -
+             startAngle);
+
+        float cs = cosf(ang);
+        float sn = sinf(ang);
+
+        //
+        // outer vertex
+        //
+        glVertex2f(
+            cx +
+            outerRadius * cs,
+            cy +
+            outerRadius * sn);
+
+        //
+        // inner vertex
+        //
+        glVertex2f(
+            cx +
+            innerRadius * cs,
+            cy +
+            innerRadius * sn);
+    }
+
+    glEnd();
 }

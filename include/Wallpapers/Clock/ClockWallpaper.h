@@ -42,6 +42,7 @@ public:
     void circle(cpoint_t center,float r,color_t color,Renderer& renderer);
     float m;
 private:
+    float m_hour24 = 0;
     float m_second = 0.f;
     float m_minute = 0.f;
     float m_hour = 0.f;

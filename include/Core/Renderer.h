@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <unordered_map>
+#include <GL/gl.h>
 
 class Renderer
 {
@@ -138,8 +141,45 @@ public:
     void scale(
         float x,
         float y);
+    
+        bool loadFont(const std::string& path,int pixelSize);
+    void unloadFont();
 
+    void drawText(
+        float x,float y,
+        const std::string& text,
+        float r,float g,float b,
+        float a=1.0f);
+    void cdrawText(
+        float x,float y,
+        const std::string& text,
+        float r,float g,float b,
+        float a=1.0f);
+
+    void drawArcDial(
+        float cx,
+        float cy,
+        float innerRadius,
+        float outerRadius,
+        float startAngle,
+        float endAngle,
+        float r,
+        float g,
+        float b,
+        float a);
 private:
+    struct Glyph
+    {
+        GLuint texture=0;
+        int width=0;
+        int height=0;
+        int bearingX=0;
+        int bearingY=0;
+        unsigned int advance=0;
+    };
+
+    std::unordered_map<char,Glyph> m_fontGlyphs;
+    bool m_fontLoaded=false;
 
     int m_width = 0;
     int m_height = 0;

@@ -19,6 +19,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(OpenGL REQUIRED)
 find_package(X11 REQUIRED)
+find_package(Freetype REQUIRED)
+
 
 # --------------------------------------------------
 # Source Files
@@ -40,6 +42,7 @@ set(WALLPAPER_SOURCES
     src/Wallpapers/GameOfLife/GameOfLife.cpp
     src/Wallpapers/Boids/Boids.cpp
     src/Wallpapers/Clock/ClockWallpaper.cpp
+    src/Wallpapers/CoreStats/CoreStats.cpp
 )
 
 set(SOURCES
@@ -78,9 +81,9 @@ target_include_directories(
 
 target_link_libraries(
     livewall
-
+    
     PRIVATE
-
+    Freetype::Freetype
     OpenGL::GL
     ${X11_LIBRARIES}
     pthread
