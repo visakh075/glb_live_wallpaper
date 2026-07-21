@@ -18,46 +18,6 @@ void Boids::shutdown()
     m_boids.clear();
 }
 
-// void Boids::createBoids()
-// {
-//     m_boids.clear();
-
-//     m_boids.resize(
-//         m_numBoids);
-
-//     for(auto& b : m_boids)
-//     {
-//         b.pos.x =
-//             rand() % std::max(1, m_width);
-
-//         b.pos.y =
-//             rand() % std::max(1, m_height);
-
-//         float angle =
-//             float(rand()) /
-//             float(RAND_MAX)
-//             *
-//             6.283185f;
-
-//         float speed =
-//             2.0f +
-//             float(rand()) /
-//             float(RAND_MAX)
-//             *
-//             (m_maxVelocity - 2.0f);
-
-//         b.vel.x =
-//             cos(angle) *
-//             speed;
-
-//         b.vel.y =
-//             sin(angle) *
-//             speed;
-
-//         b.acc = {};
-//     }
-// }
-
 void Boids::createBoids()
 {
     m_boids.clear();
@@ -748,5 +708,5 @@ void Boids::onEvent(
     }
 }
 
-LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
-    Boids)
+// LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
+//     Boids)

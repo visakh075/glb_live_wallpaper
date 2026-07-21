@@ -78,7 +78,7 @@ private:
 };
 
 int m_numBoids = 500;
-int m_numGroups = 4;
+int m_numGroups = 2;
 
 int m_numPredators = 3;
 

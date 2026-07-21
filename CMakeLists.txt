@@ -39,6 +39,7 @@ set(WALLPAPER_SOURCES
 
     src/Wallpapers/GameOfLife/GameOfLife.cpp
     src/Wallpapers/Boids/Boids.cpp
+    src/Wallpapers/Clock/ClockWallpaper.cpp
 )
 
 set(SOURCES
