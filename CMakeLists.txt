@@ -85,6 +85,7 @@ target_link_libraries(
     PRIVATE
     Freetype::Freetype
     OpenGL::GL
+    Xrender
     ${X11_LIBRARIES}
     pthread
 )

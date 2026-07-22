@@ -1,5 +1,4 @@
 #include "Wallpapers/GameOfLife/GameOfLife.h"
-#include "Core/RegisterWallpaper.h"
 #include "Core/Renderer.h"
 
 #include <algorithm>
@@ -108,21 +107,56 @@ void GameOfLife::randomize()
         c.alive =
             (std::rand() % 5) == 0;
 
+        c.age = 0;
+
         if(c.alive)
         {
-            c.alpha = 1.0f;
-            c.scale = 1.0f;
-            c.age = 0;
+            c.alpha = 0.0f;
+            c.scale = 0.0f;
         }
     }
 
     m_nextCells = m_cells;
 }
+
+// void GameOfLife::randomize()
+// {
+//     clear();
+
+//     for(auto& c : m_cells)
+//     {
+//         c.alive =
+//             (std::rand() % 5) == 0;
+
+//         if(c.alive)
+//         {
+//             c.alpha = 1.0f;
+//             c.scale = 1.0f;
+//             c.age = 0;
+//         }
+//     }
+
+//     m_nextCells = m_cells;
+// }
+// void GameOfLife::update(float dt)
+// {
+//     (void)dt;
+
+//     updateSimulation();
+
+//     updateAnimation(dt);
+// }
+
 void GameOfLife::update(float dt)
 {
-    (void)dt;
+    m_simTimer += dt;
 
-    updateSimulation();
+    if(m_simTimer >= m_simInterval)
+    {
+        m_simTimer -= m_simInterval;
+
+        updateSimulation();
+    }
 
     updateAnimation(dt);
 }
@@ -181,39 +215,129 @@ void GameOfLife::updateSimulation()
     m_cells.swap(m_nextCells);
 }
 
+// void GameOfLife::updateAnimation(float dt)
+// {
+//     const float fadeIn  = 6.0f * dt;
+//     const float fadeOut = 2.5f * dt;
+
+//     for(auto& cell : m_cells)
+//     {
+//         if(cell.alive)
+//         {
+//             cell.alpha += fadeIn;
+
+//             if(cell.alpha > 1.0f)
+//                 cell.alpha = 1.0f;
+
+//             cell.scale += fadeIn;
+
+//             if(cell.scale > 1.0f)
+//                 cell.scale = 1.0f;
+//         }
+//         else
+//         {
+//             cell.alpha -= fadeOut;
+
+//             if(cell.alpha < 0.0f)
+//                 cell.alpha = 0.0f;
+
+//             cell.scale -= fadeOut;
+
+//             if(cell.scale < 0.0f)
+//                 cell.scale = 0.0f;
+//         }
+//     }
+// }
+
 void GameOfLife::updateAnimation(float dt)
 {
-    const float fadeIn  = 6.0f * dt;
-    const float fadeOut = 2.5f * dt;
+    const float fadeIn  = 7.0f * dt;
+    const float fadeOut = 3.0f * dt;
 
-    for(auto& cell : m_cells)
+    for(auto& c : m_cells)
     {
-        if(cell.alive)
+        if(c.alive)
         {
-            cell.alpha += fadeIn;
+            c.alpha += fadeIn;
+            c.scale += fadeIn;
 
-            if(cell.alpha > 1.0f)
-                cell.alpha = 1.0f;
+            if(c.alpha > 1.0f)
+                c.alpha = 1.0f;
 
-            cell.scale += fadeIn;
-
-            if(cell.scale > 1.0f)
-                cell.scale = 1.0f;
+            if(c.scale > 1.0f)
+                c.scale = 1.0f;
         }
         else
         {
-            cell.alpha -= fadeOut;
+            c.alpha -= fadeOut;
+            c.scale -= fadeOut;
 
-            if(cell.alpha < 0.0f)
-                cell.alpha = 0.0f;
+            if(c.alpha < 0.0f)
+                c.alpha = 0.0f;
 
-            cell.scale -= fadeOut;
-
-            if(cell.scale < 0.0f)
-                cell.scale = 0.0f;
+            if(c.scale < 0.0f)
+                c.scale = 0.0f;
         }
     }
 }
+
+// void GameOfLife::render(Renderer& renderer)
+// {
+//     const float cellSize =
+//         static_cast<float>(m_cellSize);
+
+//     //---------------------------------------
+//     // Draw Cells
+//     //---------------------------------------
+
+//     for(int y = 0; y < m_height; y++)
+//     {
+//         for(int x = 0; x < m_width; x++)
+//         {
+//             const Cell& c =
+//                 cell(x,y);
+
+//             if(c.alpha <= 0.01f)
+//                 continue;
+
+//             float size =
+//                 cellSize * c.scale;
+
+//             float px =
+//                 x * cellSize +
+//                 (cellSize - size) * 0.5f;
+
+//             float py =
+//                 y * cellSize +
+//                 (cellSize - size) * 0.5f;
+
+//             renderer.drawRectangle(
+//                 px,
+//                 py,
+//                 size,
+//                 size,
+//                 0.2f,
+//                 0.55f,
+//                 1.0f,
+//                 c.alpha);
+//         }
+//     }
+
+//     //---------------------------------------
+//     // Drag Selection
+//     //---------------------------------------
+
+//     if(m_dragging)
+//     {
+//         renderer.drawRectangleOutline(
+//         m_dragStartX * m_cellSize,
+//         m_dragStartY * m_cellSize,
+//         (m_dragEndX-m_dragStartX+1)*m_cellSize,
+//         (m_dragEndY-m_dragStartY+1)*m_cellSize,
+//         1,1,1,1);
+
+//     }
+// }
 
 void GameOfLife::render(Renderer& renderer)
 {
@@ -221,15 +345,38 @@ void GameOfLife::render(Renderer& renderer)
         static_cast<float>(m_cellSize);
 
     //---------------------------------------
-    // Draw Cells
+    // Grid
+    //---------------------------------------
+
+    for(int x = 0; x <= m_width; x++)
+    {
+        renderer.drawLine(
+            x * cellSize,
+            0,
+            x * cellSize,
+            m_height * cellSize,
+            1,1,1,0.04f);
+    }
+
+    for(int y = 0; y <= m_height; y++)
+    {
+        renderer.drawLine(
+            0,
+            y * cellSize,
+            m_width * cellSize,
+            y * cellSize,
+            1,1,1,0.04f);
+    }
+
+    //---------------------------------------
+    // Cells
     //---------------------------------------
 
     for(int y = 0; y < m_height; y++)
     {
         for(int x = 0; x < m_width; x++)
         {
-            const Cell& c =
-                cell(x,y);
+            const Cell& c = cell(x,y);
 
             if(c.alpha <= 0.01f)
                 continue;
@@ -239,37 +386,69 @@ void GameOfLife::render(Renderer& renderer)
 
             float px =
                 x * cellSize +
-                (cellSize - size) * 0.5f;
+                (cellSize-size)*0.5f;
 
             float py =
                 y * cellSize +
-                (cellSize - size) * 0.5f;
+                (cellSize-size)*0.5f;
+
+            float t =
+                std::min(
+                    c.age / 25.0f,
+                    1.0f);
+
+            float r =
+                0.2f + t * 0.3f;
+
+            float g =
+                0.55f + t * 0.25f;
+
+            float b = 1.0f;
 
             renderer.drawRectangle(
                 px,
                 py,
                 size,
                 size,
-                0.2f,
-                0.55f,
-                1.0f,
+                r,
+                g,
+                b,
                 c.alpha);
         }
     }
 
     //---------------------------------------
-    // Drag Selection
+    // Selection rectangle
     //---------------------------------------
 
     if(m_dragging)
     {
-        renderer.drawRectangleOutline(
-        m_dragStartX * m_cellSize,
-        m_dragStartY * m_cellSize,
-        (m_dragEndX-m_dragStartX+1)*m_cellSize,
-        (m_dragEndY-m_dragStartY+1)*m_cellSize,
-        1,1,1,1);
+        int x0 =
+            std::min(
+                m_dragStartX,
+                m_dragEndX);
 
+        int y0 =
+            std::min(
+                m_dragStartY,
+                m_dragEndY);
+
+        int x1 =
+            std::max(
+                m_dragStartX,
+                m_dragEndX);
+
+        int y1 =
+            std::max(
+                m_dragStartY,
+                m_dragEndY);
+
+        renderer.drawRectangleOutline(
+            x0 * m_cellSize,
+            y0 * m_cellSize,
+            (x1-x0+1)*m_cellSize,
+            (y1-y0+1)*m_cellSize,
+            1,1,1,1);
     }
 }
 
@@ -499,5 +678,7 @@ void GameOfLife::mouseRelease(
         m_brushMode);
 }
 
-// LIVEWALL_REGISTER_DEFAULT_WALLPAPER(GameOfLife)
+#include "Core/RegisterWallpaper.h"
+LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
+    GameOfLife)
 

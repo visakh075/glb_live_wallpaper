@@ -77,10 +77,10 @@ private:
         size_t index);
 };
 
-int m_numBoids = 500;
-int m_numGroups = 2;
+int m_numBoids = 600;
+int m_numGroups = 3;
 
-int m_numPredators = 3;
+int m_numPredators = 0;
 
 struct Color
 {

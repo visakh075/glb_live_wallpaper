@@ -708,5 +708,6 @@ void Boids::onEvent(
     }
 }
 
+// #include "Core/RegisterWallpaper.h"
 // LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
 //     Boids)

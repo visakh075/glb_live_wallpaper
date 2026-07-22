@@ -52,10 +52,10 @@ void Renderer::resize(
 void Renderer::beginFrame()
 {
     glClearColor(
-        0.05f,
-        0.05f,
-        0.08f,
-        1.0f);
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f);
 
     glClear(GL_COLOR_BUFFER_BIT);
 

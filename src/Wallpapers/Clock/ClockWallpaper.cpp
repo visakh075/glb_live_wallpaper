@@ -203,6 +203,6 @@ void ClockWallpaper::render(Renderer& renderer)
         
 }
 
-#include "Core/RegisterWallpaper.h"
-LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
-    ClockWallpaper)
+// #include "Core/RegisterWallpaper.h"
+// LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
+//     ClockWallpaper)

@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <X11/Xatom.h>
+#include <X11/extensions/Xrender.h>
 
 namespace
 {
@@ -55,30 +56,94 @@ bool WindowManager::create()
         DefaultScreen(m_display);
 
     Window root =
-        RootWindow(m_display, screen);
+        RootWindow(
+            m_display,
+            screen);
 
     m_width =
-        DisplayWidth(m_display, screen);
+        DisplayWidth(
+            m_display,
+            screen);
 
     m_height =
-        DisplayHeight(m_display, screen);
+        DisplayHeight(
+            m_display,
+            screen);
 
-    int attr[] =
+    int fbAttribs[] =
     {
-        GLX_RGBA,
-        GLX_DOUBLEBUFFER,
-        GLX_DEPTH_SIZE, 24,
+        GLX_X_RENDERABLE , True,
+        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+        GLX_RENDER_TYPE  , GLX_RGBA_BIT,
+        GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR,
+        GLX_RED_SIZE     , 8,
+        GLX_GREEN_SIZE   , 8,
+        GLX_BLUE_SIZE    , 8,
+        GLX_ALPHA_SIZE   , 8,
+        GLX_DEPTH_SIZE   , 24,
+        GLX_DOUBLEBUFFER , True,
         None
     };
 
-    XVisualInfo* vi =
-        glXChooseVisual(
+    int fbcount = 0;
+
+    GLXFBConfig* fbconfigs =
+        glXChooseFBConfig(
             m_display,
             screen,
-            attr);
+            fbAttribs,
+            &fbcount);
+
+    if(!fbconfigs)
+        return false;
+
+    GLXFBConfig best =
+        nullptr;
+
+    XVisualInfo* vi =
+        nullptr;
+
+    for(int i = 0;
+        i < fbcount;
+        ++i)
+    {
+        XVisualInfo* tmp =
+            glXGetVisualFromFBConfig(
+                m_display,
+                fbconfigs[i]);
+
+        if(!tmp)
+            continue;
+
+        XRenderPictFormat* fmt =
+            XRenderFindVisualFormat(
+                m_display,
+                tmp->visual);
+
+        if(fmt &&
+           fmt->direct.alphaMask > 0)
+        {
+            best =
+                fbconfigs[i];
+
+            vi =
+                tmp;
+
+            break;
+        }
+
+        XFree(tmp);
+    }
+
+    XFree(fbconfigs);
 
     if(!vi)
+    {
+        std::cout
+            << "No ARGB visual found\n";
+
         return false;
+    }
 
     Colormap cmap =
         XCreateColormap(
@@ -89,9 +154,17 @@ bool WindowManager::create()
 
     XSetWindowAttributes swa{};
 
-    swa.colormap = cmap;
+    swa.colormap =
+        cmap;
 
-    swa.override_redirect = True;
+    swa.override_redirect =
+        True;
+
+    swa.background_pixel =
+        0;
+
+    swa.border_pixel =
+        0;
 
     swa.event_mask =
         ExposureMask |
@@ -116,6 +189,8 @@ bool WindowManager::create()
             vi->visual,
             CWColormap |
             CWOverrideRedirect |
+            CWBackPixel |
+            CWBorderPixel |
             CWEventMask,
             &swa);
 
@@ -144,7 +219,8 @@ bool WindowManager::create()
         XA_ATOM,
         32,
         PropModeReplace,
-        reinterpret_cast<unsigned char*>(&below),
+        reinterpret_cast<unsigned char*>(
+            &below),
         1);
 
     XMapWindow(
@@ -156,9 +232,10 @@ bool WindowManager::create()
         m_window);
 
     m_context =
-        glXCreateContext(
+        glXCreateNewContext(
             m_display,
-            vi,
+            best,
+            GLX_RGBA_TYPE,
             nullptr,
             True);
 
@@ -169,6 +246,13 @@ bool WindowManager::create()
         m_display,
         m_window,
         m_context);
+
+    glEnable(
+        GL_BLEND);
+
+    glBlendFunc(
+        GL_SRC_ALPHA,
+        GL_ONE_MINUS_SRC_ALPHA);
 
     XFree(vi);
 
