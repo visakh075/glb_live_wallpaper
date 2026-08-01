@@ -9,13 +9,6 @@ namespace {
         float y;
     } cpoint_t;
 
-    typedef struct {
-        float r;
-        float g;
-        float b;
-        float a;
-    } color_t;
-
     cpoint_t center{500,500};
 
     float rad_out;

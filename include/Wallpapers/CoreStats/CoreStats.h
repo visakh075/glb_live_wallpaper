@@ -16,14 +16,6 @@ namespace
 
     typedef struct
     {
-        float r;
-        float g;
-        float b;
-        float a;
-    } color_t;
-
-    typedef struct
-    {
         uint64_t user;
         uint64_t nice;
         uint64_t system;

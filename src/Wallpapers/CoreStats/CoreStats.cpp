@@ -157,7 +157,7 @@ bool CoreStats::initialize(Renderer& renderer)
 
     m_prevCpu =
         ReadCPUState();
-
+    renderer.setBackgroundColor({0,0,0,.3});
     std::this_thread::sleep_for(
         std::chrono::milliseconds(100));
 
@@ -315,7 +315,6 @@ void CoreStats::render(
         Blue.a);
 }
 
-// #include "Core/RegisterWallpaper.h"
-
-// LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
-//     CoreStats)
+#include "Core/RegisterWallpaper.h"
+LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
+    CoreStats)

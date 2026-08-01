@@ -16,7 +16,13 @@ bool Renderer::initialize()
     glBlendFunc(
         GL_SRC_ALPHA,
         GL_ONE_MINUS_SRC_ALPHA);
-
+    
+    // transparent by default
+    m_bgColor = {
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f};
     return true;
 }
 
@@ -52,10 +58,11 @@ void Renderer::resize(
 void Renderer::beginFrame()
 {
     glClearColor(
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f);
+        m_bgColor.r,
+        m_bgColor.g,
+        m_bgColor.g,
+        m_bgColor.a
+    );
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -665,4 +672,9 @@ void Renderer::drawArcDial(
     }
 
     glEnd();
+}
+
+void Renderer::setBackgroundColor(const color_t bgColor)
+{
+    m_bgColor = bgColor;
 }

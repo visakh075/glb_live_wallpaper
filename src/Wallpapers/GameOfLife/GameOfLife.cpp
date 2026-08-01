@@ -5,7 +5,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -19,6 +18,11 @@ GameOfLife::GameOfLife()
 
 bool GameOfLife::initialize(Renderer& renderer)
 {
+        renderer.setBackgroundColor(
+        {
+            0,0,0,.5
+        }
+    );
     (void)renderer;
 
     randomize();
@@ -119,34 +123,6 @@ void GameOfLife::randomize()
     m_nextCells = m_cells;
 }
 
-// void GameOfLife::randomize()
-// {
-//     clear();
-
-//     for(auto& c : m_cells)
-//     {
-//         c.alive =
-//             (std::rand() % 5) == 0;
-
-//         if(c.alive)
-//         {
-//             c.alpha = 1.0f;
-//             c.scale = 1.0f;
-//             c.age = 0;
-//         }
-//     }
-
-//     m_nextCells = m_cells;
-// }
-// void GameOfLife::update(float dt)
-// {
-//     (void)dt;
-
-//     updateSimulation();
-
-//     updateAnimation(dt);
-// }
-
 void GameOfLife::update(float dt)
 {
     m_simTimer += dt;
@@ -215,40 +191,6 @@ void GameOfLife::updateSimulation()
     m_cells.swap(m_nextCells);
 }
 
-// void GameOfLife::updateAnimation(float dt)
-// {
-//     const float fadeIn  = 6.0f * dt;
-//     const float fadeOut = 2.5f * dt;
-
-//     for(auto& cell : m_cells)
-//     {
-//         if(cell.alive)
-//         {
-//             cell.alpha += fadeIn;
-
-//             if(cell.alpha > 1.0f)
-//                 cell.alpha = 1.0f;
-
-//             cell.scale += fadeIn;
-
-//             if(cell.scale > 1.0f)
-//                 cell.scale = 1.0f;
-//         }
-//         else
-//         {
-//             cell.alpha -= fadeOut;
-
-//             if(cell.alpha < 0.0f)
-//                 cell.alpha = 0.0f;
-
-//             cell.scale -= fadeOut;
-
-//             if(cell.scale < 0.0f)
-//                 cell.scale = 0.0f;
-//         }
-//     }
-// }
-
 void GameOfLife::updateAnimation(float dt)
 {
     const float fadeIn  = 7.0f * dt;
@@ -281,69 +223,11 @@ void GameOfLife::updateAnimation(float dt)
     }
 }
 
-// void GameOfLife::render(Renderer& renderer)
-// {
-//     const float cellSize =
-//         static_cast<float>(m_cellSize);
-
-//     //---------------------------------------
-//     // Draw Cells
-//     //---------------------------------------
-
-//     for(int y = 0; y < m_height; y++)
-//     {
-//         for(int x = 0; x < m_width; x++)
-//         {
-//             const Cell& c =
-//                 cell(x,y);
-
-//             if(c.alpha <= 0.01f)
-//                 continue;
-
-//             float size =
-//                 cellSize * c.scale;
-
-//             float px =
-//                 x * cellSize +
-//                 (cellSize - size) * 0.5f;
-
-//             float py =
-//                 y * cellSize +
-//                 (cellSize - size) * 0.5f;
-
-//             renderer.drawRectangle(
-//                 px,
-//                 py,
-//                 size,
-//                 size,
-//                 0.2f,
-//                 0.55f,
-//                 1.0f,
-//                 c.alpha);
-//         }
-//     }
-
-//     //---------------------------------------
-//     // Drag Selection
-//     //---------------------------------------
-
-//     if(m_dragging)
-//     {
-//         renderer.drawRectangleOutline(
-//         m_dragStartX * m_cellSize,
-//         m_dragStartY * m_cellSize,
-//         (m_dragEndX-m_dragStartX+1)*m_cellSize,
-//         (m_dragEndY-m_dragStartY+1)*m_cellSize,
-//         1,1,1,1);
-
-//     }
-// }
-
 void GameOfLife::render(Renderer& renderer)
 {
     const float cellSize =
         static_cast<float>(m_cellSize);
-
+    // renderer.
     //---------------------------------------
     // Grid
     //---------------------------------------
@@ -678,7 +562,7 @@ void GameOfLife::mouseRelease(
         m_brushMode);
 }
 
-#include "Core/RegisterWallpaper.h"
-LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
-    GameOfLife)
+// #include "Core/RegisterWallpaper.h"
+// LIVEWALL_REGISTER_DEFAULT_WALLPAPER(
+//     GameOfLife)
 

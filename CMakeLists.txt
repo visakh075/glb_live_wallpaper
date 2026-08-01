@@ -5,6 +5,8 @@ project(
     LANGUAGES CXX
 )
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # --------------------------------------------------
 # C++
 # --------------------------------------------------
@@ -103,3 +105,4 @@ target_compile_options(
     -Wextra
     -Wpedantic
 )
+

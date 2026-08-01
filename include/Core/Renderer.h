@@ -3,6 +3,14 @@
 #include <unordered_map>
 #include <GL/gl.h>
 
+    typedef struct {
+       float r;
+       float g;
+       float b;
+       float a;
+    } color_t;
+
+
 class Renderer
 {
 public:
@@ -167,6 +175,8 @@ public:
         float g,
         float b,
         float a);
+
+    void setBackgroundColor(const color_t bgColor);
 private:
     struct Glyph
     {
@@ -183,4 +193,5 @@ private:
 
     int m_width = 0;
     int m_height = 0;
+    color_t m_bgColor;
 };
